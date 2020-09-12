@@ -1,0 +1,124 @@
+{
+  "name": "@builderbox/logger",
+  "version": "1.0.0",
+  "description": "This package handles everything related to the logging of the Framework Builder Box",
+  "main": "lib/index.js",
+  "types": "lib/types/index.d.ts",
+  "license": "MIT",
+  "keywords": [
+    "builder",
+    "box",
+    "logger",
+    "builder-box"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ElMijo/builder-box-core"
+  },
+  "bugs": {
+    "url": "https://github.com/ElMijo/builder-box-core/issues",
+    "email": "jerry.anselmi@gmail.com"
+  },
+  "author": {
+    "name": "Jerry Anselmi",
+    "email": "jerry.anselmi@gmail.com",
+    "url": "https://github.com/ElMijo"
+  },
+  "engines": {
+    "node": ">=12"
+  },
+  "scripts": {
+    "build": "webpack && tsc --project tsconfig.types.json",
+    "build:watch": "webpack --watch --progress",
+    "test": "yarn test:unit && yarn test:integration",
+    "test:unit": "jest --runTestsByPath tests/unit/*.test.ts --coverage",
+    "test:integration": "jest --runTestsByPath tests/integration/*.test.ts",
+    "quality": "prettier --write src && eslint ./src/**/*.{ts,js} --ext .ts,.js --fix",
+    "quality:lint": "eslint ./src/**/*.{ts,js} --ext .ts,.js --fix",
+    "quality:format": "prettier --write src"
+
+  },
+  "dependencies": {
+    "@types/winston": "^2.4.4"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.11.1",
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@babel/plugin-proposal-object-rest-spread": "^7.11.0",
+    "@babel/preset-env": "^7.11.0",
+    "@babel/preset-typescript": "^7.10.4",
+    "@types/jest": "^26.0.10",
+    "@typescript-eslint/eslint-plugin": "^3.10.1",
+    "@typescript-eslint/parser": "^3.10.1",
+    "babel-loader": "^8.1.0",
+    "clean-webpack-plugin": "^3.0.0",
+    "eslint": "^7.7.0",
+    "eslint-config-prettier": "6.11.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "fork-ts-checker-webpack-plugin": "^5.0.14",
+    "husky": "^4.2.5",
+    "jest": "^26.4.0",
+    "jest-mock-extended": "^1.0.9",
+    "lint-staged": "^10.2.12",
+    "prettier": "2.1.0",
+    "ts-jest": "^26.2.0",
+    "typescript": "^3.9.7",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12",
+    "webpack-node-externals": "^2.5.1"
+  },
+  "peerDependencies": {
+    "winston": "^3.3.3"
+  },
+  "jest": {
+    "roots": [
+      "tests"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.js"
+    ],
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "<rootDir>/src/**/*.ts"
+    ],
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/node_modules"
+    ],
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 95,
+        "functions": 95,
+        "lines": 95,
+        "statements": 95
+      }
+    }
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": ""
+    }
+  },
+  "lint-staged": {
+    "{src,test}/**/*.ts": [
+      "eslint ./src/**/*.{ts,js} --ext .ts,.js",
+      "prettier --check src"
+    ]
+  }
+}
