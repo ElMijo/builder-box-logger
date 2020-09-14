@@ -1,4 +1,10 @@
 const spyLog = jest.fn()
+const spyException = jest.fn()
+jest.doMock('../../src/format', () => ({
+    __esModule: true,
+    default: {},
+    exception: spyException
+}))
 jest.doMock('winston', () => ({
     __esModule: true,
     default: {
@@ -19,9 +25,9 @@ jest.doMock('winston', () => ({
             splat: jest.fn(),
             printf: jest.fn().mockImplementation((func: Function) => {
                 const info = {
-                    timestamp:'2050-12-01 12:00:00', 
-                    level:'info', 
-                    message:'Log message', 
+                    timestamp:'2050-12-01 12:00:00',
+                    level:'info',
+                    message:'Log message',
                     metadata: {}
                 }
                 expect(func(info)).toBe('[2050-12-01 12:00:00] INFO Log message {}')
@@ -47,16 +53,14 @@ describe("Testing logger class...", () => {
             info: "white bold blue",
             debug: "white bold pink"
         })
-        expect(winston.format.errors).toHaveBeenNthCalledWith(1, { stack: true})
-        expect(winston.format.timestamp).toHaveBeenNthCalledWith(1, { 
-            format: 'YYYY-MM-DD HH:mm:ss' 
+        expect(spyException).toHaveBeenCalledTimes(1)
+        expect(winston.format.timestamp).toHaveBeenNthCalledWith(1, {
+            format: 'YYYY-MM-DD HH:mm:ss'
         })
-        expect(winston.format.metadata).toHaveBeenNthCalledWith(1, { 
+        expect(winston.format.metadata).toHaveBeenNthCalledWith(1, {
             fillExcept: ['message', 'level', 'timestamp', 'label']
          })
         expect(winston.format.combine).toHaveBeenCalledTimes(1)
-        expect(winston.format.splat).toHaveBeenCalledTimes(1)
-        expect(winston.format.simple).toHaveBeenCalledTimes(1)
     })
     test("Logging error method without metadata", () => {
         logger.error("Testing logger error")
