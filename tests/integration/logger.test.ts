@@ -3,11 +3,13 @@ import { readFile, truncate } from 'fs'
 import winston from 'winston'
 import { Logger } from '../../src/logger'
 
+
 const filename = resolve(__dirname, './test.log')
 
-const getLog = () => new Promise((res, rej) => {
+const getLog = (debug = false) => new Promise((res, rej) => {
     readFile(filename, {encoding:'utf8'}, (err, data) => {
         if(err) return rej(err)
+        if (debug) console.log(data)
         truncate(filename, (err) => {
             if(err) return rej(err)
             res(data)
@@ -60,5 +62,14 @@ describe("Testing logger class...", () => {
     test("Logging error method with metadata", () => {
         logger.error("Testing logger", {anyKey: 'any value'})
         expect(getLog()).resolves.toMatch(logPattern([regexpDate, /ERROR/,  regexpText, regexpMeta]))
+    })
+    test("Logging exception without message", () => {
+        logger.error(new Error("Testing logger"))
+        expect(getLog()).resolves.toMatch(logPattern([regexpDate, /ERROR/,  /Error: Testing logger/]))
+    })
+
+    test("Logging exception with message", () => {
+        logger.error("Trigger Exception", new Error("Testing logger"))
+        expect(getLog()).resolves.toMatch(logPattern([regexpDate, /ERROR/,  /Trigger Exception/]))
     })
 })

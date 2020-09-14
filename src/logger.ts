@@ -1,4 +1,5 @@
 import winston from 'winston'
+import { exception } from './format'
 
 /**
  * Interface to implement Logger levels
@@ -17,12 +18,12 @@ interface LoggerColorInterface {
  * Interface to defined log method structure
  */
 interface LoggerMethod {
-    (message: string, meta: Object): LoggerInterface
+    (message: string | Error, meta: Object): LoggerInterface
 }
 
 interface LoggerExceptionMethod {
-    (expection: Error): LoggerInterface
-    (message: string, expection: Error): LoggerInterface
+    (exception: Error): LoggerInterface
+    (message: string, exception: Error): LoggerInterface
 }
 
 /**
@@ -43,14 +44,6 @@ const LoggerColor: LoggerColorInterface = {
     info: 'white bold blue',
     debug: 'white bold pink',
 }
-
-const LoggerFormat = winston.format.printf((info) => {
-    const { timestamp, level, message, metadata } = info
-    return `[${timestamp}] ${level.toUpperCase()} ${message} ${JSON.stringify(
-        metadata
-    )}`
-})
-
 /**
  * Interface to implement a Builder Box Logger
  */
@@ -116,10 +109,13 @@ export class Logger implements LoggerInterface {
                 winston.format.metadata({
                     fillExcept: ['message', 'level', 'timestamp', 'label'],
                 }),
-                winston.format.errors({ stack: true }),
-                winston.format.splat(),
-                winston.format.simple(),
-                LoggerFormat
+                exception(),
+                winston.format.printf((info) => {
+                    const { timestamp, level, message, metadata } = info
+                    return `[${timestamp}] ${level.toUpperCase()} ${message} ${JSON.stringify(
+                        metadata
+                    )}`
+                })
             ),
         })
     }
@@ -127,28 +123,28 @@ export class Logger implements LoggerInterface {
     /**
      * {@inheritdoc}
      */
-    public error(message: string, meta: Object = {}): LoggerInterface {
+    public error(message: string | Error, meta: Object = {}): LoggerInterface {
         return this.log('error', message, meta)
     }
 
     /**
      * {@inheritdoc}
      */
-    public warn(message: string, meta: Object = {}): LoggerInterface {
+    public warn(message: string | Error, meta: Object = {}): LoggerInterface {
         return this.log('warn', message, meta)
     }
 
     /**
      * {@inheritdoc}
      */
-    public info(message: string, meta: Object = {}): LoggerInterface {
+    public info(message: string | Error, meta: Object = {}): LoggerInterface {
         return this.log('info', message, meta)
     }
 
     /**
      * {@inheritdoc}
      */
-    public debug(message: string, meta: Object = {}): LoggerInterface {
+    public debug(message: string | Error, meta: Object = {}): LoggerInterface {
         return this.log('debug', message, meta)
     }
 
@@ -160,7 +156,11 @@ export class Logger implements LoggerInterface {
      * @param {Object} meta
      * @returns {LoggerInterface}
      */
-    private log(level: string, message: string, meta: Object): LoggerInterface {
+    private log(
+        level: string,
+        message: string | Error,
+        meta: Object
+    ): LoggerInterface {
         this.logger[level](message, meta)
         return this
     }
