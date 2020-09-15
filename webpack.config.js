@@ -15,7 +15,7 @@ module.exports = {
     mode: "production",
     devtool: 'source-map',
     output: {
-        filename: 'server.js',
+        filename: 'logger.js',
         path: path.resolve(__dirname, './lib'),
         libraryTarget: 'commonjs2'
     },

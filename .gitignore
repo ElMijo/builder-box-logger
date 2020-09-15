@@ -105,3 +105,4 @@ dist
 
 lib
 .vscode
+test.js
